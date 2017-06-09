@@ -1,8 +1,9 @@
 .*
-!.gitignore
 *~
 *.o
 *.d
 *.so
 *.html
-
+*.pyc
+__pycache__/*
+MANIFEST
