@@ -15,6 +15,7 @@ class DatabaseClient(object):
     def __init__(self, db_path):
         self.dbh = sqlite3.connect(db_path)
         self.dbh.execute("CREATE TABLE IF NOT EXISTS nodes (name TEXT, content TEXT)")
+        self.dbh.execute("CREATE TABLE IF NOT EXISTS edges (source TEXT, dest TEXT)")
 
     @property
     def num_nodes(self):
@@ -33,3 +34,16 @@ class DatabaseClient(object):
         rv = self.dbh.execute("SELECT * FROM nodes WHERE name='%s'" % name)
         row = rv.fetchone()
         return json.loads(row[1])
+
+    def link(self, a, b):
+        self.dbh.execute("INSERT INTO edges (source, dest) values ('%s', '%s')" % (a,b))
+        self.dbh.commit()
+
+    def get_referants(self, name):
+        rv = self.dbh.execute("SELECT * FROM edges WHERE source='%s'" % name)
+        refs = list()
+        for row in rv.fetchall():
+            rv2 = self.dbh.execute("SELECT * FROM nodes WHERE name='%s'" % row[1])
+            node = rv2.fetchone()
+            refs.append(json.loads(node[1]))
+        return refs

@@ -48,3 +48,22 @@ def test_retrieve_node_by_id(db):
 
     node = db.find('shitline')
     assert node['happy'] == 'roo'
+
+
+def test_can_link_nodes(db):
+    db.insert('one', dict(value=1))
+    db.insert('two', dict(value=2))
+    db.link('one', 'two')
+    one = db.find('one')
+    two = db.get_referants('one')[0]
+    assert two['value'] == 2
+
+
+def test_can_link_multiple_nodes(db):
+    db.insert('one', dict(value=1))
+    db.insert('two', dict(value=2))
+    db.insert('three', dict(value=3))
+    db.link('one', 'two')
+    db.link('one', 'three')
+    one = db.find('one')
+    assert len(db.get_referants('one')) == 2
