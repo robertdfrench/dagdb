@@ -1,5 +1,6 @@
 import dagdb
 import pytest
+import json
 
 
 @pytest.fixture
@@ -78,3 +79,10 @@ def test_can_link_multiple_nodes(db):
 def test_can_call_api(api_client):
     rv = api_client.get("/nodes")
     assert rv.status == '200 OK'
+
+
+def test_find_nodes_with_api(db, api_client):
+    db.insert('one', dict(value=1))
+    rv = api_client.get("/nodes")
+    nodes = json.loads(rv.get_data(as_text=True))
+    assert nodes['data'][0]['value'] == 1 

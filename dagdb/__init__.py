@@ -55,4 +55,7 @@ class DatabaseClient(object):
 
 @app.route("/nodes")
 def nodes():
-    return "good!"
+    node = dict(value=1)
+    nodes = [node]
+    response = dict(data=nodes)
+    return flask.jsonify(response)
