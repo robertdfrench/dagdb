@@ -3,6 +3,12 @@ import pytest
 
 
 @pytest.fixture
+def api_client():
+    dagdb.app.config['TESTING'] = True
+    return dagdb.app.test_client()
+
+
+@pytest.fixture
 def db():
     dagdb.clean()
     return dagdb.new()
@@ -67,3 +73,8 @@ def test_can_link_multiple_nodes(db):
     db.link('one', 'three')
     one = db.find('one')
     assert len(db.get_referants('one')) == 2
+
+
+def test_can_call_api(api_client):
+    rv = api_client.get("/nodes")
+    assert rv.status == '200 OK'

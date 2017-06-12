@@ -1,6 +1,10 @@
 import sqlite3
 import json
 import os
+import flask
+
+
+app = flask.Flask('dagdb')
 
 
 def new():
@@ -47,3 +51,8 @@ class DatabaseClient(object):
             node = rv2.fetchone()
             refs.append(json.loads(node[1]))
         return refs
+
+
+@app.route("/nodes")
+def nodes():
+    return "good!"
