@@ -1,10 +1,6 @@
 import sqlite3
 import json
 import os
-import flask
-
-
-app = flask.Flask('dagdb')
 
 
 def new():
@@ -53,28 +49,3 @@ class DatabaseClient(object):
             if node:
                 refs.append(json.loads(node[1]))
         return refs
-
-
-@app.route("/nodes")
-def nodes():
-    nodes = new().find_all()
-    response = dict(data=nodes)
-    return flask.jsonify(response)
-
-
-@app.route("/nodes/<name>/links")
-def node_links(name):
-    nodes = new().get_referants(name)
-    response = dict(data=nodes)
-    return flask.jsonify(response)
-
-
-@app.route("/nodes/<name>/links", methods=['POST'])
-def add_node_links(name):
-    db = new()
-    link_plan = flask.request.get_json()
-    for destination in link_plan['links']:
-        db.link(name, destination)
-    nodes = db.get_referants(name)
-    response = dict(data=nodes)
-    return flask.jsonify(response)
