@@ -86,3 +86,11 @@ def test_find_nodes_with_api(db, api_client):
     rv = api_client.get("/nodes")
     nodes = json.loads(rv.get_data(as_text=True))
     assert nodes['data'][0]['value'] == 1 
+
+
+def test_find_two_nodes_with_api(db, api_client):
+    db.insert('two', dict(value=2))
+    db.insert('one', dict(value=1))
+    rv = api_client.get("/nodes")
+    nodes = json.loads(rv.get_data(as_text=True))
+    assert len(nodes['data']) == 2
