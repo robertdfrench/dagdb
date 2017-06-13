@@ -1,51 +1,37 @@
-import sqlite3
+from dagdb import sqlite
 import json
-import os
+
+
+driver = sqlite
 
 
 def new():
-    return DatabaseClient("dag.sqlite")
+    return DatabaseClient()
 
 
 def clean():
-    if os.path.exists("dag.sqlite"):
-        os.remove("dag.sqlite")
+    return driver.clean()
 
 
 class DatabaseClient(object):
-    def __init__(self, db_path):
-        self.dbh = sqlite3.connect(db_path)
-        self.dbh.execute("CREATE TABLE IF NOT EXISTS nodes (name TEXT, content TEXT)")
-        self.dbh.execute("CREATE TABLE IF NOT EXISTS edges (source TEXT, dest TEXT)")
+    def __init__(self):
+        self.table = driver.new()
 
     @property
     def num_nodes(self):
-        rv = self.dbh.execute("SELECT COUNT(*) FROM nodes")
-        return rv.fetchone()[0]
+        return self.table.num_nodes
 
     def insert(self, name, node):
-        self.dbh.execute("INSERT INTO nodes (name, content) VALUES ('%s', '%s')" % (name, json.dumps(node)))
-        self.dbh.commit()
+        self.table.insert(name, json.dumps(node))
 
     def find_all(self):
-        rv = self.dbh.execute("SELECT * FROM nodes")
-        return [json.loads(row[1]) for row in rv.fetchall()]
+        return [json.loads(row) for row in self.table.find_all()]
 
     def find(self, name):
-        rv = self.dbh.execute("SELECT * FROM nodes WHERE name='%s'" % name)
-        row = rv.fetchone()
-        return json.loads(row[1])
+        return json.loads(self.table.find(name))
 
     def link(self, a, b):
-        self.dbh.execute("INSERT INTO edges (source, dest) values ('%s', '%s')" % (a,b))
-        self.dbh.commit()
+        self.table.link(a, b)
 
     def get_referants(self, name):
-        rv = self.dbh.execute("SELECT * FROM edges WHERE source='%s'" % name)
-        refs = list()
-        for row in rv.fetchall():
-            rv2 = self.dbh.execute("SELECT * FROM nodes WHERE name='%s'" % row[1])
-            node = rv2.fetchone()
-            if node:
-                refs.append(json.loads(node[1]))
-        return refs
+        return [json.loads(node) for node in self.table.get_referants(name)]
