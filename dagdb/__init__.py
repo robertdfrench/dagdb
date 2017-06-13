@@ -50,7 +50,8 @@ class DatabaseClient(object):
         for row in rv.fetchall():
             rv2 = self.dbh.execute("SELECT * FROM nodes WHERE name='%s'" % row[1])
             node = rv2.fetchone()
-            refs.append(json.loads(node[1]))
+            if node:
+                refs.append(json.loads(node[1]))
         return refs
 
 
@@ -64,5 +65,16 @@ def nodes():
 @app.route("/nodes/<name>/links")
 def node_links(name):
     nodes = new().get_referants(name)
+    response = dict(data=nodes)
+    return flask.jsonify(response)
+
+
+@app.route("/nodes/<name>/links", methods=['POST'])
+def add_node_links(name):
+    db = new()
+    link_plan = flask.request.get_json()
+    for destination in link_plan['links']:
+        db.link(name, destination)
+    nodes = db.get_referants(name)
     response = dict(data=nodes)
     return flask.jsonify(response)
