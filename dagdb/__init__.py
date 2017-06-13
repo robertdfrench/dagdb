@@ -12,7 +12,8 @@ def new():
 
 
 def clean():
-    os.remove("dag.sqlite")
+    if os.path.exists("dag.sqlite"):
+        os.remove("dag.sqlite")
 
 
 class DatabaseClient(object):
