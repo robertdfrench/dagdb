@@ -94,3 +94,15 @@ def test_find_two_nodes_with_api(db, api_client):
     rv = api_client.get("/nodes")
     nodes = json.loads(rv.get_data(as_text=True))
     assert len(nodes['data']) == 2
+
+
+def test_find_referants_of_node(db, api_client):
+    db.insert('one', dict(value=1))
+    db.insert('one', dict(value=1))
+    db.insert('two', dict(value=2))
+    db.insert('three', dict(value=3))
+    db.link('one', 'two')
+    db.link('one', 'three')
+    rv = api_client.get("/nodes/one/links")
+    referants = json.loads(rv.get_data(as_text=True))
+    assert referants['data'][1]['value'] == 3

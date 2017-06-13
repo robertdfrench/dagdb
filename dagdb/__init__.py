@@ -59,3 +59,10 @@ def nodes():
     nodes = new().find_all()
     response = dict(data=nodes)
     return flask.jsonify(response)
+
+
+@app.route("/nodes/<name>/links")
+def node_links(name):
+    nodes = new().get_referants(name)
+    response = dict(data=nodes)
+    return flask.jsonify(response)
