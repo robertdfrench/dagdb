@@ -1,8 +1,8 @@
-from dagdb import sqlite
+from dagdb import dynamodb
 import json
 
 
-driver = sqlite
+driver = dynamodb
 
 
 def new():
@@ -19,7 +19,7 @@ class DatabaseClient(object):
 
     @property
     def num_nodes(self):
-        return self.table.num_nodes
+        return self.table.num_nodes()
 
     def insert(self, name, node):
         self.table.insert(name, json.dumps(node))

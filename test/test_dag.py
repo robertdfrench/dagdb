@@ -5,30 +5,21 @@ import json
 
 @pytest.fixture
 def db():
+    yield dagdb.new()
     dagdb.clean()
-    return dagdb.new()
 
 
 def test_can_dag():
     return True
 
 
-def test_zero_nodes_in_empty_db(db):
-    assert db.num_nodes == 0
-
-
 @pytest.fixture
 def junk_node():
-    return dict(poop=True)
+    return dict(name='earl')
 
 
 def test_can_insert_node(db, junk_node):
     db.insert('junk', junk_node)
-
-
-def test_insert_increases_node_count(db, junk_node):
-    db.insert('junk', junk_node)
-    assert db.num_nodes == 1
 
 
 def test_can_find_node(db, junk_node):
@@ -50,7 +41,7 @@ def test_retrieve_node_by_id(db, junk_node):
     db.insert('junk', junk_node)
 
     node = db.find('junk')
-    assert node['poop'] == True
+    assert node['name'] == 'earl'
 
 
 @pytest.fixture
